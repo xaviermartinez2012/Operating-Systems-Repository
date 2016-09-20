@@ -18,7 +18,7 @@ using namespace std;
 
 int main(){
     // create my msgQ with key value from ftok()
-    int qid = msgget(ftok(".",'u'), IPC_EXCL|IPC_CREAT|0600);
+    int qid = msgget(ftok(".",'u'), IPC_EXCL|IPC_CREAT|0666);
     
     // declare my message buffer
     struct buf {
@@ -26,29 +26,47 @@ int main(){
         char arr[20][101]; // message container
     };
     
-    buf clients[3] = {false, false, false};
-    bool clientsRecieved[3];
+    buf clients[3];
+    bool clientsRecieved[3] = {false, false, false};
     int size = sizeof(buf)-sizeof(long);
     
-    bool allRecieved = false;
-    while (!allRecieved){
+    while (!clientsRecieved[0] or !clientsRecieved[1] or !clientsRecieved[2]){
         try {
             if (!clientsRecieved[0]) {
-                msgrcv(qid, (struct msgbuf *)&clients[0], size, 1, IPC_NOWAIT);
+                int ret = msgrcv(qid, (struct msgbuf *)&clients[0], size, 1, IPC_NOWAIT);
+                if (ret < 0) {
+                    throw system_error(ENOMSG, system_category());
+                }
+                else clientsRecieved[0] = true;
             }
+        } catch (system_error& err) {
+            cout << ".. Waiting for Client1 ... " << endl;
+        }
+        try {
             if (!clientsRecieved[1]) {
-                msgrcv(qid, (struct msgbuf *)&clients[1], size, 2, IPC_NOWAIT);
+                int ret = msgrcv(qid, (struct msgbuf *)&clients[1], size, 2, IPC_NOWAIT);
+                if (ret < 0) {
+                    throw system_error(ENOMSG, system_category());
+                }
+                else clientsRecieved[1] = true;
             }
+        } catch (system_error& err) {
+            cout << ".. Waiting for Client2 ... " << endl;
+        }
+        try {
             if (!clientsRecieved[2]) {
-                msgrcv(qid, (struct msgbuf *)&clients[2], size, 3, IPC_NOWAIT);
+                int ret = msgrcv(qid, (struct msgbuf *)&clients[2], size, 3, IPC_NOWAIT);
+                if (ret < 0) {
+                    throw system_error(ENOMSG, system_category());
+                }
+                else clientsRecieved[2] = true;
             }
-            allRecieved = true;
-            cout << "...finished." << endl;
-        } catch (system_error err) {
-            cout << "..." << endl;
+        } catch (system_error& err) {
+            cout << ".. Waiting for Client3 ... " << endl;
         }
     }
-    
+    cout << "...finished." << endl;
+
     
     return 0;
 }
