@@ -1,5 +1,3 @@
-// This is a test...
-
 //
 //  Client0.cpp
 //  Operating Systems Projects
