@@ -32,9 +32,11 @@ void populate(char *arr, char client, int index){
         }
         if (i == 2) {
             arr[i] = (char)('0' + tens);
+            continue;
         }
         if (i == 3) {
             arr[i] = (char)('0' + ones);
+            continue;
         }
         arr[i] = rand()%(90-65 + 1) + 65;
     }
@@ -54,11 +56,10 @@ int main(){
     int qid = msgget(ftok(".",'u'), 0);
     char client = '1';
     
-    mBuf message;
-    message.mtype = 111;
-    int messageSize = sizeof(message)-sizeof(long);
-    
     for (int i = 0; i < 20; i ++) {
+        mBuf message;
+        message.mtype = 111;
+        int messageSize = sizeof(message)-sizeof(long);
         populate(message.message, client, i);
         int code = msgsnd(qid, (struct msgbuf *)&message, messageSize, 0);
         cout << code << endl;
