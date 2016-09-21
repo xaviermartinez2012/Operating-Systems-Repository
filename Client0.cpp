@@ -70,6 +70,9 @@ int main(){
     
     int userChoice = 0;
     while (userChoice >= 0) {
+        mBuf message;
+        message.mtype = 111;
+        int messageSize = sizeof(message)-sizeof(long);
         message.message[0] = '1';
         message.message[1] = client;
         cout << "Enter index: ";
