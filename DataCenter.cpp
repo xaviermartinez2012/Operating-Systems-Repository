@@ -35,13 +35,13 @@ int main(){
     // create my msgQ with key value from ftok()
     int qid = msgget(ftok(".",'u'), IPC_EXCL|IPC_CREAT|0600);
     if (qid == -1){
-        cout << "Message Queue already created. Please use \"ipcrm -q <qid>\" to remove conflicting queue. Exiting..."
+        cout << "Message Queue already created. Please use \"ipcrm -q <qid>\" to remove conflicting queue. Exiting...";
         exit(1);
     }
     
     client one;
-    client two;
-    client three;
+//    client two;
+//    client three;
     
     mBuf tmp;
     int messageSize = sizeof(tmp)-sizeof(long);
