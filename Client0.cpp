@@ -65,29 +65,30 @@ int main(){
     }
     
     rBuf request;
-    request.mtype = 222;
     int requestSize = sizeof(request)-sizeof(long);
     
     int userChoice = 0;
     while (userChoice >= 0) {
-        cout << "Enter index: ";
-        cin >> userChoice;
-        int ones = userChoice % 10;
-        int tens = userChoice / 10;
         message.message[0] = '1';
         message.message[1] = client;
-        message.message[2] = (char)('0' + tens);
-        message.message[3] = (char)('0' + ones);
-        msgsnd(qid, (struct msgbuf *)&message, messageSize, 0);
+        cout << "Enter index: ";
+        cin >> userChoice;
         if (userChoice != -1) {
-            msgrcv(qid, (struct msgbuf *)&message, messageSize, 111, 0);
-            for (int i = 2; i < 102; i++) {
-                cout << message.message[i];
-            }
-            cout << endl;
+            message.message[2] = '2';
+            message.message[3] = '0';
+            msgsnd(qid, (struct msgbuf *)&message, messageSize, 0);
         }
         else {
-            end = true;
+            int ones = userChoice % 10;
+            int tens = userChoice / 10;
+            message.message[2] = (char)('0' + tens);
+            message.message[3] = (char)('0' + ones);
+            msgsnd(qid, (struct msgbuf *)&message, messageSize, 0);
+            msgrcv(qid, (struct msgbuf *)&request, requestSize, 222, 0);
+            for (int i = 0; i < 100; i++){
+                cout << request.message[i];
+            }
+            cout << endl;
         }
     }
     return 0;
