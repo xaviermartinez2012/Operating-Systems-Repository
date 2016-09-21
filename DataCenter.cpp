@@ -15,7 +15,6 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <cstdlib>
-#include <thread>
 using namespace std;
 
 struct mBuf {
