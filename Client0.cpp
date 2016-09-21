@@ -17,40 +17,66 @@
 
 using namespace std;
 
-void populate(char arr[][101], int size){
-    for (int i=0; i < size; i++) {
-        for (int j=0; j < 100; j++) {
-            srand(time(NULL));
-            arr[i][j] = rand()%(90-65 + 1) + 65;
+void populate(char *arr, int index){
+    int ones = index % 10;
+    int tens = index / 10;
+    for (int i = 0; i < 102; i++) {
+        if (i == 0) {
+            arr[i] = (char)('0' + tens);
+            continue;
         }
+        if (i == 1) {
+            arr[i] = (char)('0' + ones);
+            continue;
+        }
+        srand(time(NULL));
+        arr[i] = rand()%(90-65 + 1) + 65;
     }
 }
 
+struct mBuf {
+    long mtype; // required
+    char message[102]; // message container
+};
+
+
+struct rBuf {
+    long mtype; // required
+    int choice; // message container
+};
+
 int main(){
     int qid = msgget(ftok(".",'u'), 0);
+    mBuf message;
+    message.mtype = 111;
+    int messageSize = sizeof(message)-sizeof(long);
     
-    // declare my message buffer
-    struct buf {
-        long mtype; // required
-        char arr[20][101]; // message container
-    };
-    buf msg0;
-    msg0.mtype = 1;
-    populate(msg0.arr, 20);
+    for (int i = 0; i < 20; i ++) {
+        populate(message.message, i);
+        msgsnd(qid, (struct msgbuf *)&message, messageSize, 0);
+    }
     
-    buf msg1;
-    msg1.mtype = 2;
-    populate(msg1.arr, 20);
+    rBuf request;
+    request.mtype = 111;
+    int requestSize = sizeof(request)-sizeof(long);
     
-    buf msg2;
-    msg2.mtype = 3;
-    populate(msg2.arr, 20);
-    
-    int size = sizeof(buf)-sizeof(long);
-    
-    msgsnd(qid, (struct msgbuf *)&msg0, size, 0);
-    msgsnd(qid, (struct msgbuf *)&msg1, size, 0);
-    msgsnd(qid, (struct msgbuf *)&msg2, size, 0);
-    
+    int userChoice = -1;
+    bool end = false;
+    while (!end) {
+        cout << "Enter index: ";
+        cin >> userChoice;
+        request.choice = userChoice;
+        msgsnd(qid, (struct msgbuf *)&request, requestSize, 0);
+        if (userChoice != -1) {
+            msgrcv(qid, (struct msgbuf *)&message, messageSize, 111, 0);
+            for (int i = 2; i < 102; i++) {
+                cout << message.message[i];
+            }
+            cout << endl;
+        }
+        else {
+            end = true;
+        }
+    }
     return 0;
 }

@@ -14,59 +14,58 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <cstdlib>
+#include <thread>
 using namespace std;
+
+// declare my message buffer
+struct mBuf {
+    long mtype; // required
+    char message[102]; // message container
+};
+
+struct rBuf {
+    long mtype; // required
+    int choice; // message container
+};
+
+void clientHandler(int qid, int mtype){
+    mBuf messages[20];
+    mBuf temp;
+    int messageSize = sizeof(temp)-sizeof(long);
+    
+    for (int i = 0; i < 20; i++) {
+        msgrcv(qid, (struct msgbuf *)&temp, messageSize, mtype, 0);
+        char tens = temp.message[0];
+        char ones = temp.message[1];
+        int index = (10 * (int)(tens - '0')) + (int)(ones - '0');
+        messages[index] = temp;
+    }
+    
+    rBuf request;
+    int requestSize = sizeof(request)-sizeof(long);
+    bool connection = true;
+    while (connection) {
+        msgrcv(qid, (struct msgbuf *)&request, requestSize, mtype, 0);
+        if (request.choice != -1) {
+            msgsnd(qid, (struct msgbuf *)&messages[request.choice], messageSize, 0);
+        }
+        else connection = false;
+    }
+}
+
 
 int main(){
     // create my msgQ with key value from ftok()
-    int qid = msgget(ftok(".",'u'), IPC_EXCL|IPC_CREAT|0666);
+    int qid = msgget(ftok(".",'u'), IPC_EXCL|IPC_CREAT|0600);
     
-    // declare my message buffer
-    struct buf {
-        long mtype; // required
-        char arr[20][101]; // message container
-    };
+    thread client1(clientHandler, qid, 111);
+//    thread client2(clientHandler, qid, 222);
+//    thread client3(clientHandler, qid, 333);
+    client1.join();
+//    client2.join();
+//    client3.join();
     
-    buf clients[3];
-    bool clientsRecieved[3] = {false, false, false};
-    int size = sizeof(buf)-sizeof(long);
-    
-    while (!clientsRecieved[0] or !clientsRecieved[1] or !clientsRecieved[2]){
-        try {
-            if (!clientsRecieved[0]) {
-                int ret = msgrcv(qid, (struct msgbuf *)&clients[0], size, 1, IPC_NOWAIT);
-                if (ret < 0) {
-                    throw system_error(ENOMSG, system_category());
-                }
-                else clientsRecieved[0] = true;
-            }
-        } catch (system_error& err) {
-            cout << ".. Waiting for Client1 ... " << endl;
-        }
-        try {
-            if (!clientsRecieved[1]) {
-                int ret = msgrcv(qid, (struct msgbuf *)&clients[1], size, 2, IPC_NOWAIT);
-                if (ret < 0) {
-                    throw system_error(ENOMSG, system_category());
-                }
-                else clientsRecieved[1] = true;
-            }
-        } catch (system_error& err) {
-            cout << ".. Waiting for Client2 ... " << endl;
-        }
-        try {
-            if (!clientsRecieved[2]) {
-                int ret = msgrcv(qid, (struct msgbuf *)&clients[2], size, 3, IPC_NOWAIT);
-                if (ret < 0) {
-                    throw system_error(ENOMSG, system_category());
-                }
-                else clientsRecieved[2] = true;
-            }
-        } catch (system_error& err) {
-            cout << ".. Waiting for Client3 ... " << endl;
-        }
-    }
-    cout << "...finished." << endl;
-
+    msgctl (qid, IPC_RMID, NULL);
     
     return 0;
 }
