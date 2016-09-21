@@ -17,55 +17,67 @@
 #include <thread>
 using namespace std;
 
-// declare my message buffer
 struct mBuf {
     long mtype; // required
-    char message[102]; // message container
+    char message[104]; // message container
+};
+
+struct client{
+    char arr[20][100];
 };
 
 struct rBuf {
     long mtype; // required
-    int choice; // message container
+    char message[100]; // message container
 };
-
-void clientHandler(int qid, int mtype){
-    mBuf messages[20];
-    mBuf temp;
-    int messageSize = sizeof(temp)-sizeof(long);
-    
-    for (int i = 0; i < 20; i++) {
-        msgrcv(qid, (struct msgbuf *)&temp, messageSize, mtype, 0);
-        char tens = temp.message[0];
-        char ones = temp.message[1];
-        int index = (10 * (int)(tens - '0')) + (int)(ones - '0');
-        messages[index] = temp;
-    }
-    
-    rBuf request;
-    int requestSize = sizeof(request)-sizeof(long);
-    bool connection = true;
-    while (connection) {
-        msgrcv(qid, (struct msgbuf *)&request, requestSize, mtype, 0);
-        if (request.choice != -1) {
-            msgsnd(qid, (struct msgbuf *)&messages[request.choice], messageSize, 0);
-        }
-        else connection = false;
-    }
-}
 
 
 int main(){
     // create my msgQ with key value from ftok()
     int qid = msgget(ftok(".",'u'), IPC_EXCL|IPC_CREAT|0600);
     
-    thread client1(clientHandler, qid, 111);
-//    thread client2(clientHandler, qid, 222);
-//    thread client3(clientHandler, qid, 333);
-    client1.join();
-//    client2.join();
-//    client3.join();
+    client one;
+    client two;
+    client three;
     
+    mBuf tmp;
+    tmp.mtype = 111;
+    int messageSize = sizeof(tmp)-sizeof(long);
+    
+    rBuf snd;
+    snd.mtype = 222;
+    int sndSize = sizeof(snd)-sizeof(long);
+    
+    int counter = 0;
+    while (counter < 3) {
+        msgrcv(qid, (struct msgbuf *)&tmp, messageSize, 111, 0);
+        if (tmp.message[0] == '0') {
+            if (tmp.message[1] == '1') {
+                char tens = tmp.message[2];
+                char ones = tmp.message[3];
+                int index = (10 * (int)(tens - '0')) + (int)(ones - '0');
+                for (int i = 4; i < 104; i++) {
+                    one.arr[index][i] = tmp.message[i];
+                }
+            }
+        }
+        else {
+            if (tmp.message[1] == '1') {
+                char tens = tmp.message[2];
+                char ones = tmp.message[3];
+                int index = (10 * (int)(tens - '0')) + (int)(ones - '0');
+                if (index != 20) {
+                    for (int i = 0; i < 100; i++) {
+                        snd.message[i] = one.arr[index][i];
+                    }
+                    msgsnd(qid, (struct msgbuf *)&snd, sndSize, 0);
+                }
+                else {
+                    counter++;
+                }
+            }
+        }
+    }
     msgctl (qid, IPC_RMID, NULL);
-    
     return 0;
 }
