@@ -1,4 +1,3 @@
-// this is a test
 //
 //  DataCenter.cpp
 //  Operating Systems Projects
@@ -35,13 +34,16 @@ struct rBuf {
 int main(){
     // create my msgQ with key value from ftok()
     int qid = msgget(ftok(".",'u'), IPC_EXCL|IPC_CREAT|0600);
+    if (qid == -1){
+        cout << "Message Queue already created. Please use \"ipcrm -q <qid>\" to remove conflicting queue. Exiting..."
+        exit(1);
+    }
     
     client one;
     client two;
     client three;
     
     mBuf tmp;
-    tmp.mtype = 111;
     int messageSize = sizeof(tmp)-sizeof(long);
     
     rBuf snd;
