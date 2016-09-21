@@ -17,56 +17,68 @@
 
 using namespace std;
 
-void populate(char *arr, int index){
+void populate(char *arr, char client, int index){
     int ones = index % 10;
     int tens = index / 10;
-    for (int i = 0; i < 102; i++) {
+    srand(time(NULL));
+    for (int i = 0; i < 104; i++) {
         if (i == 0) {
-            arr[i] = (char)('0' + tens);
+            arr[i] = '0';
             continue;
         }
         if (i == 1) {
-            arr[i] = (char)('0' + ones);
+            arr[i] = client;
             continue;
         }
-        srand(time(NULL));
+        if (i == 2) {
+            arr[i] = (char)('0' + tens);
+        }
+        if (i == 3) {
+            arr[i] = (char)('0' + ones);
+        }
         arr[i] = rand()%(90-65 + 1) + 65;
     }
 }
 
 struct mBuf {
     long mtype; // required
-    char message[102]; // message container
+    char message[104]; // message container
 };
-
 
 struct rBuf {
     long mtype; // required
-    int choice; // message container
+    char message[100]; // message container
 };
 
 int main(){
     int qid = msgget(ftok(".",'u'), 0);
+    char client = '1';
+    
     mBuf message;
     message.mtype = 111;
     int messageSize = sizeof(message)-sizeof(long);
     
     for (int i = 0; i < 20; i ++) {
-        populate(message.message, i);
-        msgsnd(qid, (struct msgbuf *)&message, messageSize, 0);
+        populate(message.message, client, i);
+        int code = msgsnd(qid, (struct msgbuf *)&message, messageSize, 0);
+        cout << code << endl;
     }
     
     rBuf request;
-    request.mtype = 111;
+    request.mtype = 222;
     int requestSize = sizeof(request)-sizeof(long);
     
-    int userChoice = -1;
-    bool end = false;
-    while (!end) {
+    int userChoice = 0;
+    while (userChoice >= 0) {
         cout << "Enter index: ";
         cin >> userChoice;
-        request.choice = userChoice;
-        msgsnd(qid, (struct msgbuf *)&request, requestSize, 0);
+        int ones = userChoice % 10;
+        int tens = userChoice / 10;
+        message.message[0] = '1';
+        message.message[1] = client;
+        message.message[2] = (char)('0' + tens);
+        message.message[3] = (char)('0' + ones);
+        msgsnd(qid, (struct msgbuf *)&message, messageSize, 0);
         if (userChoice != -1) {
             msgrcv(qid, (struct msgbuf *)&message, messageSize, 111, 0);
             for (int i = 2; i < 102; i++) {
