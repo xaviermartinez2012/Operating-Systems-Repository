@@ -35,7 +35,8 @@ int main(){
     // create my msgQ with key value from ftok()
     int qid = msgget(ftok(".",'u'), IPC_EXCL|IPC_CREAT|0600);
     if (qid == -1){
-        cout << "Message Queue already created. Please use \"ipcrm -q <qid>\" to remove conflicting queue. Exiting...";
+        cout << "Message Queue already created. Please use \"ipcrm -q <qid>\" to remove conflicting queue (to find the qid use \"ipcs -q\")." << endl;
+        cout << "Exiting..." << endl;
         exit(1);
     }
     
@@ -51,31 +52,29 @@ int main(){
     int sndSize = sizeof(snd)-sizeof(long);
     
     int counter = 0;
-    while (counter < 3) {
+    while (counter < 1) {
         msgrcv(qid, (struct msgbuf *)&tmp, messageSize, 111, 0);
-        if (tmp.message[0] == '0') {
-            if (tmp.message[1] == '1') {
-                char tens = tmp.message[2];
-                char ones = tmp.message[3];
+        char container[105];
+        strcpy(container, tmp.message);
+        cout << container << endl;
+        if (container[0] == '0') {
+            if (container[1] == '1') {
+                char tens = container[2];
+                char ones = container[3];
                 int index = (10 * (int)(tens - '0')) + (int)(ones - '0');
                 for (int i = 4; i < 104; i++) {
-                    one.arr[index][i-4] = tmp.message[i];
+                    one.arr[index][i-4] = container[i];
                 }
-                char *ptr = &(one.arr[index][100]);
-                ptr = NULL;
+                one.arr[index][100] = '\0';
             }
         }
         else {
-            if (tmp.message[1] == '1') {
-                char tens = tmp.message[2];
-                char ones = tmp.message[3];
+            if (container[1] == '1') {
+                char tens = container[2];
+                char ones = container[3];
                 int index = (10 * (int)(tens - '0')) + (int)(ones - '0');
                 if (index != 20) {
-                    for (int i = 0; i < 100; i++) {
-                        snd.message[i] = one.arr[index][i];
-                    }
-                    char *ptr = &(snd.message[100]);
-                    ptr = NULL;
+                    strcpy(snd.message, one.arr[index]);
                     msgsnd(qid, (struct msgbuf *)&snd, sndSize, 0);
                 }
                 else {

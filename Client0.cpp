@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <cstdlib>
+#include <string>
 
 using namespace std;
 
@@ -44,23 +45,38 @@ void populate(char *arr, char client, int index){
 
 struct mBuf {
     long mtype; // required
-    char message[104]; // message container
+    char message[105]; // message container
 };
 
 struct rBuf {
     long mtype; // required
-    char message[100]; // message container
+    char message[101]; // message container
 };
 
 int main(){
     int qid = msgget(ftok(".",'u'), 0);
+    
+    string requestHeader = "11";
     char client = '1';
     
     for (int i = 0; i < 20; i ++) {
+        srand(time(NULL));
         mBuf message;
         message.mtype = 111;
         int messageSize = sizeof(message)-sizeof(long);
-        populate(message.message, client, i);
+        string messageHeader = "01";
+        int ones = i % 10;
+        int tens = i / 10;
+        messageHeader = messageHeader + (char)('0' + tens);
+        messageHeader = messageHeader + (char)('0' + ones);
+        for (int j = 4; j < 104; j++) {
+            messageHeader = messageHeader + (char)(rand()%(90-65 + 1) + 65);
+        }
+        char msg[105];
+        size_t length = messageHeader.copy(msg, 104);
+        msg[length] = '\0';
+        cout << "Message is: " << msg << endl;
+        strcpy(message.message, msg);
         int code = msgsnd(qid, (struct msgbuf *)&message, messageSize, 0);
         cout << code << endl;
     }
