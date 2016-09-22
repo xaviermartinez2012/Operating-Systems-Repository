@@ -49,19 +49,19 @@ int main(){
         msgrcv(qid, (struct msgbuf *)&tmp, messageSize, 111, 0);
         char container[105];
         strcpy(container, tmp.message);
-        cout << container << endl;
+        cout << "R: " << container[0] << " C: " << container[1] << " S.ID: " << container[2] << container[3] << endl;
         if (container[0] == '0') {
             if (container[1] == '1') {
                 char tens = container[2];
                 char ones = container[3];
-                int index = (10 * (int)(tens - '0')) + (int)(ones - '0');
+                int index = (10 * ((int)(tens - '0'))) + ((int)(ones - '0'));
                 for (int i = 4; i < 104; i++) {
                     one.arr[index][i-4] = container[i];
                 }
                 one.arr[index][100] = '\0';
             }
         }
-        else {
+        else if (container[0] == '1') {
             if (container[1] == '1') {
                 char tens = container[2];
                 char ones = container[3];
@@ -77,6 +77,10 @@ int main(){
                     counter++;
                 }
             }
+        }
+        else {
+            cout << "An error has occured. \"R\" field of message header is missing or incorrect";
+            counter = 20;
         }
     }
     msgctl (qid, IPC_RMID, NULL);

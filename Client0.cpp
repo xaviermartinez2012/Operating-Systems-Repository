@@ -19,31 +19,6 @@
 
 using namespace std;
 
-// void populate(char *arr, char client, int index){
-//     int ones = index % 10;
-//     int tens = index / 10;
-//     srand(time(NULL));
-//     for (int i = 0; i < 104; i++) {
-//         if (i == 0) {
-//             arr[i] = '0';
-//             continue;
-//         }
-//         if (i == 1) {
-//             arr[i] = client;
-//             continue;
-//         }
-//         if (i == 2) {
-//             arr[i] = (char)('0' + tens);
-//             continue;
-//         }
-//         if (i == 3) {
-//             arr[i] = (char)('0' + ones);
-//             continue;
-//         }
-//         arr[i] = rand()%(90-65 + 1) + 65;
-//     }
-// }
-
 struct mBuf {
     long mtype; // required
     char message[105]; // message container
@@ -74,22 +49,19 @@ int main(){
             messageHeader += (char)(rand()%(90-65 + 1) + 65);
         }
         char msg[105];
-        size_t length = messageHeader.copy(msg, 104);
-        msg[length] = '\0';
+        messageHeader.copy(msg, 104);
+        msg[104] = '\0';
         cout << "Message is: " << msg << endl;
         strcpy(message.message, msg);
         int code = msgsnd(qid, (struct msgbuf *)&message, messageSize, 0);
         cout << code << endl;
     }
     
-    rBuf request;
-    int requestSize = sizeof(request)-sizeof(long);
-    
     int userChoice = 0;
     while (userChoice >= 0) {
-        mBuf message;
-        message.mtype = 111;
-        int messageSize = sizeof(message)-sizeof(long);
+        mBuf rMessage;
+        rMessage.mtype = 111;
+        int messageSize = sizeof(rMessage)-sizeof(long);
         string messageHeader = "1";
         messageHeader += client;
         cout << "Enter index: ";
@@ -99,14 +71,21 @@ int main(){
             int tens = userChoice / 10;
             messageHeader += (char)('0' + tens);
             messageHeader += (char)('0' + ones);
+            cout << "Message header: " << messageHeader << endl;
             for (int j = 4; j < 104; j++) {
-                messageHeader += '0';
+                messageHeader += (char)'X';
             }
             char msg[105];
-            size_t length = messageHeader.copy(msg, 104);
-            msg[length] = '\0';
-            msgsnd(qid, (struct msgbuf *)&message, messageSize, 0);
-            msgrcv(qid, (struct msgbuf *)&request, requestSize, 222, 0);
+            messageHeader.copy(msg, 104);
+            msg[104] = '\0';
+            cout << "Message is: " << msg << endl;
+            msgsnd(qid, (struct msgbuf *)&rMessage, messageSize, 0);
+            rBuf request;
+            int requestSize = sizeof(request)-sizeof(long);
+            int code = msgrcv(qid, (struct msgbuf *)&request, requestSize, 222, 0);
+            if (code == -1){
+                break;
+            }
             char req[101];
             strcpy(req, request.message);
             for (int i = 0; i < 101; i ++){
@@ -115,15 +94,16 @@ int main(){
             cout << endl;
         }
         else {
-            messageHeader += '2';
-            messageHeader += '0';
+            messageHeader += (char)'2';
+            messageHeader += (char)'0';
             for (int j = 4; j < 104; j++) {
-                messageHeader += '0';
+                messageHeader += (char)'X';
             }
             char msg[105];
             size_t length = messageHeader.copy(msg, 104);
             msg[length] = '\0';
-            msgsnd(qid, (struct msgbuf *)&message, messageSize, 0);
+            cout << "Message is: " << msg << endl;
+            msgsnd(qid, (struct msgbuf *)&rMessage, messageSize, 0);
         }
     }
     return 0;
