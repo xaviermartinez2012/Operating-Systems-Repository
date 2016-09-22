@@ -41,18 +41,11 @@ int main(){
     }
     
     client one;
-//    client two;
-//    client three;
-    
-    mBuf tmp;
-    int messageSize = sizeof(tmp)-sizeof(long);
-    
-    rBuf snd;
-    snd.mtype = 222;
-    int sndSize = sizeof(snd)-sizeof(long);
     
     int counter = 0;
     while (counter < 1) {
+        mBuf tmp;
+        int messageSize = sizeof(tmp)-sizeof(long);
         msgrcv(qid, (struct msgbuf *)&tmp, messageSize, 111, 0);
         char container[105];
         strcpy(container, tmp.message);
@@ -74,6 +67,9 @@ int main(){
                 char ones = container[3];
                 int index = (10 * (int)(tens - '0')) + (int)(ones - '0');
                 if (index != 20) {
+                    rBuf snd;
+                    snd.mtype = 222;
+                    int sndSize = sizeof(snd)-sizeof(long);
                     strcpy(snd.message, one.arr[index]);
                     msgsnd(qid, (struct msgbuf *)&snd, sndSize, 0);
                 }

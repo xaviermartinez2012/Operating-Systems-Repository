@@ -64,13 +64,14 @@ int main(){
         mBuf message;
         message.mtype = 111;
         int messageSize = sizeof(message)-sizeof(long);
-        string messageHeader = "0" + client;
+        string messageHeader = "0";
+        messageHeader += client;
         int ones = i % 10;
         int tens = i / 10;
-        messageHeader = messageHeader + (char)('0' + tens);
-        messageHeader = messageHeader + (char)('0' + ones);
+        messageHeader += (char)('0' + tens);
+        messageHeader += (char)('0' + ones);
         for (int j = 4; j < 104; j++) {
-            messageHeader = messageHeader + (char)(rand()%(90-65 + 1) + 65);
+            messageHeader += (char)(rand()%(90-65 + 1) + 65);
         }
         char msg[105];
         size_t length = messageHeader.copy(msg, 104);
@@ -89,27 +90,40 @@ int main(){
         mBuf message;
         message.mtype = 111;
         int messageSize = sizeof(message)-sizeof(long);
-        string messageHeader = "1" + client;
+        string messageHeader = "1";
+        messageHeader += client;
         cout << "Enter index: ";
         cin >> userChoice;
         if (userChoice != -1) {
             int ones = userChoice % 10;
             int tens = userChoice / 10;
-            messageHeader = messageHeader + (char)('0' + tens);
-            messageHeader = messageHeader + (char)('0' + ones);
-            msgsnd(qid, (struct msgbuf *)&message, messageSize, 0);
-        }
-        else {
-            int ones = userChoice % 10;
-            int tens = userChoice / 10;
-            message.message[2] = (char)('0' + tens);
-            message.message[3] = (char)('0' + ones);
+            messageHeader += (char)('0' + tens);
+            messageHeader += (char)('0' + ones);
+            for (int j = 4; j < 104; j++) {
+                messageHeader += '0';
+            }
+            char msg[105];
+            size_t length = messageHeader.copy(msg, 104);
+            msg[length] = '\0';
             msgsnd(qid, (struct msgbuf *)&message, messageSize, 0);
             msgrcv(qid, (struct msgbuf *)&request, requestSize, 222, 0);
-            for (int i = 0; i < 100; i++){
-                cout << request.message[i];
+            char req[101];
+            strcpy(req, request.message);
+            for (int i = 0; i < 101; i ++){
+                cout << req[i];
             }
             cout << endl;
+        }
+        else {
+            messageHeader += '2';
+            messageHeader += '0';
+            for (int j = 4; j < 104; j++) {
+                messageHeader += '0';
+            }
+            char msg[105];
+            size_t length = messageHeader.copy(msg, 104);
+            msg[length] = '\0';
+            msgsnd(qid, (struct msgbuf *)&message, messageSize, 0);
         }
     }
     return 0;
