@@ -18,16 +18,16 @@ using namespace std;
 
 struct mBuf {
     long mtype; // required
-    char message[104]; // message container
+    char message[105]; // message container
 };
 
 struct client{
-    char arr[20][100];
+    char arr[20][101];
 };
 
 struct rBuf {
     long mtype; // required
-    char message[100]; // message container
+    char message[101]; // message container
 };
 
 
@@ -59,8 +59,10 @@ int main(){
                 char ones = tmp.message[3];
                 int index = (10 * (int)(tens - '0')) + (int)(ones - '0');
                 for (int i = 4; i < 104; i++) {
-                    one.arr[index][i] = tmp.message[i];
+                    one.arr[index][i-4] = tmp.message[i];
                 }
+                char *ptr = &(one.arr[index][100]);
+                ptr = NULL;
             }
         }
         else {
@@ -72,6 +74,8 @@ int main(){
                     for (int i = 0; i < 100; i++) {
                         snd.message[i] = one.arr[index][i];
                     }
+                    char *ptr = &(snd.message[100]);
+                    ptr = NULL;
                     msgsnd(qid, (struct msgbuf *)&snd, sndSize, 0);
                 }
                 else {
