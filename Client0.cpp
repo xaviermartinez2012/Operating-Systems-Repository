@@ -84,6 +84,7 @@ int main(){
             int requestSize = sizeof(request)-sizeof(long);
             int code = msgrcv(qid, (struct msgbuf *)&request, requestSize, 222, 0);
             if (code == -1){
+                cout << "There has been an error with the data server. Exiting..." << endl;
                 break;
             }
             char req[101];

@@ -79,7 +79,7 @@ int main(){
             }
         }
         else {
-            cout << "An error has occured. \"R\" field of message header is missing or incorrect";
+            cout << "An error has occured. \"R\" field of message header is missing or incorrect" << endl;
             counter = 20;
         }
     }
