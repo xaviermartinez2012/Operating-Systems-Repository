@@ -1,5 +1,5 @@
 //
-//  Client0.cpp
+//  Client2.cpp
 //  Operating Systems Projects
 //
 //  Created by Xavier Martinez on 9/18/16.
@@ -33,7 +33,7 @@ int main(){
     srand(time(0));
     int qid = msgget(ftok(".",'u'), 0);
     string requestHeader = "11";
-    char client = '1';
+    char client = '2';
     
     for (int i = 0; i < 20; i ++) {
         mBuf message;
@@ -79,7 +79,7 @@ int main(){
             msgsnd(qid, (struct msgbuf *)&rMessage, messageSize, 0);
             rBuf request;
             int requestSize = sizeof(request)-sizeof(long);
-            int code = msgrcv(qid, (struct msgbuf *)&request, requestSize, 101, 0);
+            int code = msgrcv(qid, (struct msgbuf *)&request, requestSize, 102, 0);
             if (code == -1){
                 cout << "There has been an error with the data server. Exiting..." << endl;
                 break;
