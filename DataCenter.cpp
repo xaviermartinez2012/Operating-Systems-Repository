@@ -67,7 +67,11 @@ int main(){
                     rBuf snd;
                     snd.mtype = 222;
                     int sndSize = sizeof(snd)-sizeof(long);
-                    strcpy(snd.message, one.arr[index]);
+                    char msg[100];
+                    for (int i = 0; i < 100; i++) {
+                        msg[i] = one.arr[index][i];
+                    }
+                    strcpy(snd.message, msg);
                     msgsnd(qid, (struct msgbuf *)&snd, sndSize, 0);
                 }
                 else {
