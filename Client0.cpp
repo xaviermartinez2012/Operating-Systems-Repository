@@ -84,12 +84,7 @@ int main(){
                 cout << "There has been an error with the data server. Exiting..." << endl;
                 break;
             }
-            char req[101];
-            strcpy(req, request.message);
-            for (int i = 0; i < 101; i ++){
-                cout << req[i];
-            }
-            cout << endl;
+            cout << request.message << endl;
         }
         else {
             messageHeader += (char)'2';

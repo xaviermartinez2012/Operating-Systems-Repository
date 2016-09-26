@@ -47,23 +47,21 @@ int main(){
         mBuf tmp;
         int messageSize = sizeof(tmp)-sizeof(long);
         msgrcv(qid, (struct msgbuf *)&tmp, messageSize, 111, 0);
-        char container[105];
-        strcpy(container, tmp.message);
-        cout << "R: " << container[0] << " C: " << container[1] << " S.ID: " << container[2] << container[3] << endl;
-        if (container[0] == '0') {
-            if (container[1] == '1') {
-                char tens = container[2];
-                char ones = container[3];
+        cout << "R: " << tmp.message[0] << " C: " << tmp.message[1] << " S.ID: " << tmp.message[2] << tmp.message[3] << endl;
+        if (tmp.message[0] == '0') {
+            if (tmp.message[1] == '1') {
+                char tens = tmp.message[2];
+                char ones = tmp.message[3];
                 int index = (10 * ((int)(tens - '0'))) + ((int)(ones - '0'));
                 for (int i = 4; i < 104; i++) {
-                    one.arr[index][i-4] = container[i];
+                    one.arr[index][i-4] = tmp.message[i];
                 }
             }
         }
-        else if (container[0] == '1') {
-            if (container[1] == '1') {
-                char tens = container[2];
-                char ones = container[3];
+        else if (tmp.message[0] == '1') {
+            if (tmp.message[1] == '1') {
+                char tens = tmp.message[2];
+                char ones = tmp.message[3];
                 int index = (10 * (int)(tens - '0')) + (int)(ones - '0');
                 if (index != 20) {
                     rBuf snd;
