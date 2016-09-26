@@ -41,9 +41,11 @@ int main(){
     }
     
     client one;
+    client two;
+    client three;
     
     int counter = 0;
-    while (counter < 1) {
+    while (counter < 3) {
         mBuf tmp;
         int messageSize = sizeof(tmp)-sizeof(long);
         msgrcv(qid, (struct msgbuf *)&tmp, messageSize, 111, 0);
@@ -57,6 +59,22 @@ int main(){
                     one.arr[index][i-4] = tmp.message[i];
                 }
             }
+            else if (tmp.message[1] == '2') {
+                char tens = tmp.message[2];
+                char ones = tmp.message[3];
+                int index = (10 * ((int)(tens - '0'))) + ((int)(ones - '0'));
+                for (int i = 4; i < 104; i++) {
+                    two.arr[index][i-4] = tmp.message[i];
+                }
+            }
+            else if (tmp.message[1] == '3') {
+                char tens = tmp.message[2];
+                char ones = tmp.message[3];
+                int index = (10 * ((int)(tens - '0'))) + ((int)(ones - '0'));
+                for (int i = 4; i < 104; i++) {
+                    three.arr[index][i-4] = tmp.message[i];
+                }
+            }
         }
         else if (tmp.message[0] == '1') {
             if (tmp.message[1] == '1') {
@@ -65,11 +83,49 @@ int main(){
                 int index = (10 * (int)(tens - '0')) + (int)(ones - '0');
                 if (index != 20) {
                     rBuf snd;
-                    snd.mtype = 222;
+                    snd.mtype = 101;
                     int sndSize = sizeof(snd)-sizeof(long);
                     char msg[100];
                     for (int i = 0; i < 100; i++) {
                         msg[i] = one.arr[index][i];
+                    }
+                    strcpy(snd.message, msg);
+                    msgsnd(qid, (struct msgbuf *)&snd, sndSize, 0);
+                }
+                else {
+                    counter++;
+                }
+            }
+            else if (tmp.message[1] == '2') {
+                char tens = tmp.message[2];
+                char ones = tmp.message[3];
+                int index = (10 * (int)(tens - '0')) + (int)(ones - '0');
+                if (index != 20) {
+                    rBuf snd;
+                    snd.mtype = 102;
+                    int sndSize = sizeof(snd)-sizeof(long);
+                    char msg[100];
+                    for (int i = 0; i < 100; i++) {
+                        msg[i] = two.arr[index][i];
+                    }
+                    strcpy(snd.message, msg);
+                    msgsnd(qid, (struct msgbuf *)&snd, sndSize, 0);
+                }
+                else {
+                    counter++;
+                }
+            }
+            else if (tmp.message[1] == '3') {
+                char tens = tmp.message[2];
+                char ones = tmp.message[3];
+                int index = (10 * (int)(tens - '0')) + (int)(ones - '0');
+                if (index != 20) {
+                    rBuf snd;
+                    snd.mtype = 103;
+                    int sndSize = sizeof(snd)-sizeof(long);
+                    char msg[100];
+                    for (int i = 0; i < 100; i++) {
+                        msg[i] = three.arr[index][i];
                     }
                     strcpy(snd.message, msg);
                     msgsnd(qid, (struct msgbuf *)&snd, sndSize, 0);
