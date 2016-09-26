@@ -94,6 +94,7 @@ int main(){
             }
             char msg[104];
             messageHeader.copy(msg, 104);
+            strcpy(rMessage.message, msg);
             msgsnd(qid, (struct msgbuf *)&rMessage, messageSize, 0);
         }
     }
