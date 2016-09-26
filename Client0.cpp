@@ -48,10 +48,8 @@ int main(){
         for (int j = 4; j < 104; j++) {
             messageHeader += (char)(rand()%(90-65 + 1) + 65);
         }
-        char msg[105];
+        char msg[104];
         messageHeader.copy(msg, 104);
-        msg[104] = '\0';
-        cout << "Message is: " << msg << endl;
         strcpy(message.message, msg);
         int code = msgsnd(qid, (struct msgbuf *)&message, messageSize, 0);
         cout << code << endl;
@@ -75,10 +73,9 @@ int main(){
             for (int j = 4; j < 104; j++) {
                 messageHeader += (char)'X';
             }
-            char msg[105];
+            char msg[104];
             messageHeader.copy(msg, 104);
-            msg[104] = '\0';
-            cout << "Message is: " << msg << endl;
+            strcpy(rMessage.message, msg);
             msgsnd(qid, (struct msgbuf *)&rMessage, messageSize, 0);
             rBuf request;
             int requestSize = sizeof(request)-sizeof(long);
@@ -100,10 +97,8 @@ int main(){
             for (int j = 4; j < 104; j++) {
                 messageHeader += (char)'X';
             }
-            char msg[105];
-            size_t length = messageHeader.copy(msg, 104);
-            msg[length] = '\0';
-            cout << "Message is: " << msg << endl;
+            char msg[104];
+            messageHeader.copy(msg, 104);
             msgsnd(qid, (struct msgbuf *)&rMessage, messageSize, 0);
         }
     }

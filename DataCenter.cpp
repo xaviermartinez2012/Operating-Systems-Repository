@@ -22,7 +22,7 @@ struct mBuf {
 };
 
 struct client{
-    char arr[20][101];
+    char arr[20][100];
 };
 
 struct rBuf {
@@ -58,7 +58,6 @@ int main(){
                 for (int i = 4; i < 104; i++) {
                     one.arr[index][i-4] = container[i];
                 }
-                one.arr[index][100] = '\0';
             }
         }
         else if (container[0] == '1') {
