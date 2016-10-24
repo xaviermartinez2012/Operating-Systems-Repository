@@ -64,18 +64,26 @@ int main(){
             childPid = fork();
             if(childPid == 0)  // Fork succeeded
             {
+                bool found = false;
                 // Prompt user for an uppercase letter to search within the aray
                 char userInput;
                 cout << "Enter an uppercase character: ";
                 cin >> userInput;
-                
-                // Count occurences of the letter in the array
-                int occurences;
-                occurences = count(arr, userInput, size);
-                cout << userInput << " appears in the array " << occurences << " times." << endl;
-                
-                // Terminate the child successfully
-                exit(EXIT_SUCCESS);
+                while(!found){
+                    // Count occurences of the letter in the array
+                    int occurences;
+                    occurences = count(arr, userInput, size);
+                    cout << userInput << " appears in the array " << occurences << " times." << endl;
+                    
+                    // Injected bug (infinite loop)
+                    if (occurences < 1) {
+                        cout << "Searching again..." << endl;
+                    }
+                    else {
+                        // Terminate the child successfully
+                        exit(EXIT_SUCCESS);
+                    }
+                }
             }
             
             else if(childPid < 0)  // Fork failed
@@ -87,7 +95,7 @@ int main(){
             // Make parent process wait for child termination
             else {
                 int returnStatus;
-                waitpid(childPid, &returnStatus, 0);  // Parent process waits here for child to terminate.
+                waitpid(childPid, &returnStatus, 0);
                 
                 // Deallocate the array
                 delete []arr;
