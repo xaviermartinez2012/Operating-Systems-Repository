@@ -99,6 +99,7 @@ int main(){
                 
                 // Deallocate the array
                 delete []arr;
+                exitProgram = true;
             }
         }
         // End program
