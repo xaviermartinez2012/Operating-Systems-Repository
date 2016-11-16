@@ -59,15 +59,16 @@ int main(){
 }
 
 void parent_cleanup (SEMAPHORE &sem) {
-    wait(0);	/* wait for child to exit */
     sem.remove();
 }
 
 void husband_process(SEMAPHORE & sem, double * accounts, int process_identifier){
+    bool tf [] = {true, false};
     int randnum = rand();
     int transactions = 0;
-    while (transactions < 10) {
-        if (randnum % 37003 == 0) {
+    while (transactions < 100) {
+        if (tf[(randnum % 2)]) {
+	    cout << "Process " << process_identifier << " in here." << endl;
             int randnum2 = (rand() % 3) + 1;
             switch (randnum2) {
                 
