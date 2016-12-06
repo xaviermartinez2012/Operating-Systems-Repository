@@ -79,6 +79,7 @@ int main(){
 void husband_process(SEMAPHORE & sem, double * accounts, int process_identifier){
     int randnum = rand();
     int transactions = 0;
+    account_status(accounts);
     while (transactions < 100) {
         if (randnum % 37003) {
             int randnum2 = (rand() % 3) + 1;
@@ -116,6 +117,7 @@ void husband_process(SEMAPHORE & sem, double * accounts, int process_identifier)
         }
         randnum = rand();
     }
+    account_status(accounts);
 }
 
 void account_status(double * accounts){
