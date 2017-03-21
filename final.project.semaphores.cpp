@@ -1,5 +1,5 @@
 //
-//  semaphores.cpp
+//  final.project.semaphores.cpp
 //  Operating Systems Projects
 //
 //  Created by Xavier Martinez on 11/15/16.
@@ -36,14 +36,14 @@ int main(){
     
     // Establish accounts
     double * accounts = (double *) shmat(shm_id, NULL, 0);
-    accounts[0] = 500000;
-    accounts[1] = 100000;
-    accounts[2] = 5000;
-    accounts[3] = 1000000;
-    accounts[4] = 10000;
-    accounts[5] = 30000;
-    accounts[6] = 5000;
-    accounts[7] = 300000;
+    accounts[SAVINGS] = 500000;
+    accounts[CHECKING] = 100000;
+    accounts[MONEY_MARKET] = 5000;
+    accounts[IRA] = 1000000;
+    accounts[CARD] = 10000;
+    accounts[AUTO] = 30000;
+    accounts[LOC] = 5000;
+    accounts[MORTGAGE] = 300000;
     
     // Initialize semaphores
     SEMAPHORE sem(9);
